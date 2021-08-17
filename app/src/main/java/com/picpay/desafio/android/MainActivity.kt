@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         userViewModel.getUsers()
     }
 
-    fun observeData() {
+    private fun observeData() {
         userViewModel.state.observe(this) {
             when (it) {
                 is OnSuccess -> {
