@@ -13,7 +13,6 @@ import com.picpay.desafio.android.UserViewModel.*
 import com.picpay.desafio.android.UserViewModel.State.OnLoading
 import com.picpay.desafio.android.UserViewModel.State.OnSuccess
 import com.picpay.desafio.android.adapters.UserListAdapter
-import com.picpay.desafio.android.data.AppDatabase
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
