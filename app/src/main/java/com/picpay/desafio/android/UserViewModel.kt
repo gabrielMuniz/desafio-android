@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.picpay.desafio.android.domain.UserEntity
 import com.picpay.desafio.android.domain.interactor.UserUseCase
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -15,14 +16,14 @@ class UserViewModel(private val userUseCase: UserUseCase) : ViewModel() {
 
     fun getUsers() {
         state.value = State.OnLoading
-        try {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            try {
                 userUseCase.getUsers().collect {
                     state.value = State.OnSuccess(it)
                 }
+            } catch (e: Exception) {
+                state.value = State.OnError
             }
-        } catch (e: Exception) {
-            state.value = State.OnError
         }
     }
 

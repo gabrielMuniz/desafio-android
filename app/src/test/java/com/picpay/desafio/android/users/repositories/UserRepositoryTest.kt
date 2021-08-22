@@ -1,34 +1,53 @@
-package com.picpay.desafio.android
+package com.picpay.desafio.android.users.repositories
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import com.picpay.desafio.android.domain.UserEntity
+import com.picpay.desafio.android.data.repositories.UserRemoteRepositoryImpl
 import com.picpay.desafio.android.data.services.PicPayService
+import com.picpay.desafio.android.data.services.requestmaker.RequestMaker
 import com.picpay.desafio.android.data.users.UserResponse
+import com.picpay.desafio.android.shared.CoroutineTestRule
+import com.picpay.desafio.android.users.UsersStub
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import retrofit2.Call
-import retrofit2.Response
 
-class PicPayServiceTest {
+@ExperimentalCoroutinesApi
+class UserRepositoryTest {
 
-    private val api = mock<PicPayService>()
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
 
-    private val service = PicPayService(api)
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
+    private val picPayService = mock<PicPayService>()
+    private val requestMaker = mock<RequestMaker>()
+
+    private val repository =
+        UserRemoteRepositoryImpl(requestMaker = requestMaker, picPayService = picPayService)
 
     @Test
-    fun exampleTest() {
-        // given
-        val call = mock<Call<List<UserResponse>>>()
-        val expectedUsers = emptyList<UserResponse>()
+    fun `Given a users list When the getUsers is called Then the users returned should be right`() {
+        coroutinesTestRule.testDispatcher.runBlockingTest {
+            // given
+            val call = mock<Call<List<UserResponse>>>()
+            val expectedResponseUsers = UsersStub.userResponsesStub
+            val expectedEntityUsers = UsersStub.userEntitiesStub
 
-        whenever(call.execute()).thenReturn(Response.success(expectedUsers))
-        whenever(api.getUsers()).thenReturn(call)
+            whenever(picPayService.getUsers()).thenReturn(call)
+            whenever(requestMaker.getResult(call)).thenReturn(expectedResponseUsers)
 
-        // when
-        val users = service.example()
-
-        // then
-        assertEquals(users, expectedUsers)
+            // when
+            repository.getUsers().collect {
+                assertEquals(expectedEntityUsers, it)
+            }
+        }
     }
 }

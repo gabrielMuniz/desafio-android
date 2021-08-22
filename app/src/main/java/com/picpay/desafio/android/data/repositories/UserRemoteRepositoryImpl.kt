@@ -11,7 +11,7 @@ class UserRemoteRepositoryImpl(
     private val picPayService: PicPayService
 ) : UserRepository {
     override suspend fun getUsers() =
-        flow { emit(requestMaker.getResult(picPayService.getUsers()).map { it.toEntity() }) }
+            flow { emit(requestMaker.getResult(picPayService.getUsers()).map { it.toEntity() }) }
 }
 
 private fun UserResponse.toEntity() = UserEntity(img, name, id, username)
