@@ -12,9 +12,9 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Test
+import org.koin.test.AutoCloseKoinTest
 
-
-class MainActivityTest {
+class MainActivityTest : AutoCloseKoinTest() {
 
     private val server = MockWebServer()
 
@@ -45,7 +45,9 @@ class MainActivityTest {
         server.start(serverPort)
 
         launchActivity<MainActivity>().apply {
-            // TODO("validate if list displays items returned by server")
+            moveToState(Lifecycle.State.RESUMED)
+
+            onView(withText("Eduardo Santos")).check(matches(isDisplayed()))
         }
 
         server.close()
